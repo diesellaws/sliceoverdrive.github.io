@@ -1,9 +1,149 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="title" content="Slice Overdrive" />
+		<meta
+			name="description"
+			content="Slice Overdrive is a razor-sharp platformer where every slice matters. Dodge lethal hazards and master the blade through unique hand-made levels."
+		/>
+		<meta
+			name="keywords"
+			content="slice, overdrive, game, indie, action, platformer, arcade, steam, challenging, difficult, fun, "
+		/>
+		<meta name="robots" content="index, follow" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="language" content="English" />
+		<meta name="revisit-after" content="5 days" />
+		<meta name="author" content="Diesel Laws" />
+
 		<title>Slice Overdrive</title>
+		<link rel="stylesheet" type="text/css" href="styles.css" />
+		<link
+			rel="apple-touch-icon"
+			sizes="180x180"
+			href="apple-touch-icon.png"
+		/>
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="32x32"
+			href="favicon-32x32.png"
+		/>
+		<link
+			rel="icon"
+			type="image/png"
+			sizes="16x16"
+			href="favicon-16x16.png"
+		/>
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
+		<link rel="manifest" href="site.webmanifest" />
 	</head>
+
 	<body>
-		<p>A game. Website coming soon.</p>
+		<div class="bg"></div>
+		<div class="bg bg2"></div>
+		<div class="bg bg3"></div>
+
+		<div class="hero">
+			<img
+				src="images/SliceOverdriveLogo.png"
+				alt="Slice Overdrive Logo"
+				class="hero-logo"
+			/>
+			<img
+				src="images/SliceCharacter.png"
+				alt="Slice Character"
+				class="hero-character"
+			/>
+
+			<img src="images/SliceCharacter.png" class="ghost" />
+			<img src="images/SliceCharacter.png" class="ghost" />
+			<img src="images/SliceCharacter.png" class="ghost" />
+			<img src="images/SliceCharacter.png" class="ghost" />
+			<img src="images/SliceCharacter.png" class="ghost" />
+			<img src="images/SliceCharacter.png" class="ghost" />
+			<img src="images/SliceCharacter.png" class="ghost" />
+			<img src="images/SliceCharacter.png" class="ghost" />
+			<img src="images/SliceCharacter.png" class="ghost" />
+			<img src="images/SliceCharacter.png" class="ghost" />
+		</div>
+
+		<div class="description">
+			<p>
+				Slice Overdrive is a precision action platformer about speed,
+				control, and clean execution. Chain up to three directional
+				slices, dodge around lethal traps, and use quick double jumps to
+				keep momentum and reach the portal. One mistake and the run
+				resets!
+			</p>
+
+			<!-- <a
+				href="https://store.steampowered.com/app/XXXX"
+				class="steam-button"
+				>View on Steam</a
+			> -->
+		</div>
+
+		<script>
+			const heroChar = document.querySelector(".hero-character");
+			const ghosts = document.querySelectorAll(".ghost"); // manually added ghost <img>
+
+			let targetX = window.innerWidth / 2;
+			let targetY = window.innerHeight / 2;
+			let currentX = targetX;
+			let currentY = targetY;
+
+			const history = [];
+
+			document.addEventListener("mousemove", (e) => {
+				targetX = e.clientX;
+				targetY = e.clientY;
+			});
+
+			function animate() {
+				const lerpFactor = 0.1; // 0.05 = slower lag, 0.2 = faster
+				currentX += (targetX - currentX) * lerpFactor;
+				currentY += (targetY - currentY) * lerpFactor;
+
+				// center main character at mouse
+				const halfWidth = heroChar.offsetWidth / 2;
+				const halfHeight = heroChar.offsetHeight / 2;
+
+				heroChar.style.left = currentX - halfWidth + "px";
+				heroChar.style.top = currentY - halfHeight + "px";
+
+				// save position into history
+				history.push({ x: currentX, y: currentY });
+				if (history.length > 300) history.shift();
+
+				// update ghosts using older history
+				ghosts.forEach((ghost, i) => {
+					// spread ghosts evenly along history
+					const spacing = 10; // adjust to control how stretched the trail looks
+					const index = history.length - (i + 1) * spacing;
+
+					if (index >= 0) {
+						const pos = history[index];
+						const gHalfW = ghost.offsetWidth / 2;
+						const gHalfH = ghost.offsetHeight / 2;
+
+						ghost.style.left = pos.x - gHalfW + "px";
+						ghost.style.top = pos.y - gHalfH + "px";
+
+						// opacity fades out more aggressively
+						const fade = 1 - (i + 1) / (ghosts.length + 1);
+						ghost.style.opacity = fade * 0.5; // 0.5 = max brightness for the first ghost
+
+						// stacking: newest ghosts higher, oldest ghosts lower
+						ghost.style.zIndex = i;
+					}
+				});
+
+				requestAnimationFrame(animate);
+			}
+
+			animate();
+		</script>
 	</body>
 </html>
